@@ -1,0 +1,15 @@
+
+elasticsearch:
+  indexClusterHosts: ${ELASTICSEARCH_URL:http://127.0.0.1:9200}
+  indexClusterPassword: ${ELASTICSEARCH_PASSWORD:changeme}
+  indexClusterUsername: ${ELASTICSEARCH_USER:elastic}
+  linkIndexName: link-index
+  maxInflightRequests: 15
+  connectionTimeoutMs: 1000000
+  compression: true
+  requestTimeout: 60000
+  socketTimeoutMs: 1000000
+  maxIdleTimeMs: 30000
+
+server:
+  port: 8080

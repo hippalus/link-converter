@@ -1,0 +1,32 @@
+//PUT link-index
+{
+  "settings": {
+    "number_of_replicas": 1,
+    "number_of_shards": 20
+  },
+  "mappings": {
+    "properties": {
+      "lastIndexedTime": {
+        "type": "date"
+      },
+      "source": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "target": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      }
+    }
+  }
+}

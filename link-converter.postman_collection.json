@@ -1,0 +1,108 @@
+{
+	"info": {
+		"_postman_id": "530eb222-5094-4deb-8e4d-b91b71a29f5c",
+		"name": "link-converter",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "to-deeplink",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"url\": \"https://www.trendyol.com/casio/saat-p-1925865?boutiqueId=439892&merchantId=105064\"\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/link-converter/weblink-to-deeplink",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"link-converter",
+						"weblink-to-deeplink"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "to-weblink",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"url\": \"ty://?Page=Product&ContentId=1925865&CampaignId=439892&MerchantId=105064\"\r\n}\r\n\r\n"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/link-converter/deeplink-to-weblink",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"link-converter",
+						"deeplink-to-weblink"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getStoredRequests",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "root123",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "elastic",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9200/link-index/_search",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9200",
+					"path": [
+						"link-index",
+						"_search"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

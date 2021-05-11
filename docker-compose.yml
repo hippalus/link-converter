@@ -1,0 +1,102 @@
+version: '3'
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ES_VERSION:-7.8.1}
+    container_name: link-converter-elasticsearch
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - node.name=linkconverter-elasticsearch
+      - discovery.type=single-node
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD:-root123}
+      - cluster.name=linkconverter-elasticsearch-cluster
+      - bootstrap.memory_lock=true
+      - xpack.monitoring.enabled=true
+      - xpack.ml.node_concurrent_job_allocations=8
+      - xpack.security.enabled=true
+      - http.host=0.0.0.0
+    networks:
+      link-converter-net:
+        aliases:
+          - es
+          - elasticsearch
+    volumes:
+      - esdata01:/usr/share/elasticsearch/data
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health | grep -vq '\"status\":\"red\"'"]
+      retries: 10
+      interval: 20s
+    ports:
+      - "127.0.0.1:${ELASTICSEARCH_PORT:-9200}:9200"
+    cap_add:
+      - IPC_LOCK
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:${ES_VERSION:-7.8.1}
+    container_name: link-converter-kibana
+    environment:
+      SERVER_HOST: "0.0.0.0"
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      ELASTICSEARCH_USERNAME: elastic
+      ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD:-root123}
+      XPACK_SECURITY_SECURECOOKIES: "false"
+      XPACK_MONITORING_KIBANA_COLLECTION_ENABLED: "false"
+      XPACK_MONITORING_ENABLED: "true"
+    networks:
+      link-converter-net:
+        aliases:
+          - kibana
+    ports:
+      - "127.0.0.1:${KIBANA_PORT:-5601}:5601"
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '2m'
+        max-file: '5'
+    healthcheck:
+      test: ["CMD", "curl", "--write-out", "'HTTP %{http_code}'", "--silent", "--output", "/dev/null", "http://kibana:5601/"]
+      retries: 10
+      interval: 10s
+    depends_on:
+      - elasticsearch
+
+  link-converter-service:
+    build:
+      context: .
+    image: link-converter-service:${ES_VERSION:-7.8.1}
+    container_name: link-converter-service
+    networks:
+      link-converter-net:
+        aliases:
+          - link-converter-service
+    ports:
+      - "127.0.0.1:${LINK_CONVERTER_PORT:-8080}:8080"
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '2m'
+        max-file: '5'
+    environment:
+      ELASTICSEARCH_USER: elastic
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD:-root123}
+    depends_on:
+      - elasticsearch
+
+networks:
+  link-converter-net:
+    driver: bridge
+volumes:
+  esdata01:
+    driver: local
